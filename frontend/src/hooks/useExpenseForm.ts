@@ -22,9 +22,29 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
   const [errors, setErrors] = useState<Partial<ExpenseFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isFutureDate = (dateValue: string) => {
+    if (!dateValue) return false;
+
+    const selectedDate = new Date(`${dateValue}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return selectedDate > today;
+  };
+
   const handleChange = (field: keyof ExpenseFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field when user starts typing
+
+    // Validate date immediately to catch manually entered future dates.
+    if (field === "date" && isFutureDate(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        date: "Future dates are not allowed. Please select today or an earlier date.",
+      }));
+      return;
+    }
+
+    // Clear error for this field when user fixes it.
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -47,6 +67,9 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
 
     if (!formData.date) {
       newErrors.date = "Date is required";
+    } else if (isFutureDate(formData.date)) {
+      newErrors.date =
+        "Future dates are not allowed. Please select today or an earlier date.";
     }
 
     setErrors(newErrors);
