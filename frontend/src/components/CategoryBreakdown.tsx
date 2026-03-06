@@ -1,5 +1,4 @@
 import React from "react";
-import { CATEGORY_EMOJIS } from "../constants/categoryEmojis";
 import { COLORS } from "../constants/colors";
 
 interface CategoryData {
@@ -12,12 +11,14 @@ interface CategoryBreakdownProps {
   categories: CategoryData[];
   total: number;
   totalCount: number;
+  categoryEmojis: Record<string, string>;
 }
 
 const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
   categories,
   total,
   totalCount,
+  categoryEmojis,
 }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(true);
 
@@ -200,7 +201,7 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
             >
               <div style={itemInfoStyle}>
                 <span style={itemIconStyle}>
-                  {CATEGORY_EMOJIS[category.category] || "📊"}
+                  {categoryEmojis[category.category] || categoryEmojis.Other || "-"}
                 </span>
                 <div style={itemDetailsStyle}>
                   <div style={itemNameStyle}>{category.category}</div>
@@ -220,3 +221,5 @@ const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
 };
 
 export default CategoryBreakdown;
+
+

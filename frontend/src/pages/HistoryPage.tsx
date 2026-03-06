@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { Category, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -8,11 +8,30 @@ import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
 import { Modal, Button } from "../vibes";
 import { COLORS } from "../constants/colors";
+import {
+  buildCategoryEmojiMap,
+  CATEGORY_EMOJIS,
+  resolveCategoryIcon,
+} from "../constants/categoryEmojis";
 
-const HistoryPage: React.FC = () => {
+interface HistoryPageProps {
+  categories: Category[];
+}
+
+const HistoryPage: React.FC<HistoryPageProps> = ({ categories }) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const categoriesWithIcons = categories.map((category) => {
+    const resolvedIcon = resolveCategoryIcon(category.icon);
+    const fallbackIcon = CATEGORY_EMOJIS[category.name] || CATEGORY_EMOJIS.Other;
+
+    return {
+      ...category,
+      icon: resolvedIcon || fallbackIcon,
+    };
+  });
 
   // Get year and month from URL params, default to current date if not provided
   const getInitialYearMonth = () => {
@@ -96,11 +115,12 @@ const HistoryPage: React.FC = () => {
     {} as Record<string, { category: string; amount: number; count: number }>,
   );
 
-  const categories = Object.values(categoryData).sort(
+  const categoryStats = Object.values(categoryData).sort(
     (a, b) => b.amount - a.amount,
   );
-  const total = categories.reduce((sum, cat) => sum + cat.amount, 0);
-  const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
+  const total = categoryStats.reduce((sum, cat) => sum + cat.amount, 0);
+  const totalCount = categoryStats.reduce((sum, cat) => sum + cat.count, 0);
+  const categoryEmojis = buildCategoryEmojiMap(categoriesWithIcons);
 
   const pageStyle: React.CSSProperties = {
     padding: "48px 64px",
@@ -165,14 +185,17 @@ const HistoryPage: React.FC = () => {
         ) : (
           <>
             <CategoryBreakdown
-              categories={categories}
+              categories={categoryStats}
               total={total}
               totalCount={totalCount}
+              categoryEmojis={categoryEmojis}
             />
             <div style={{ marginTop: "32px" }}>
               <CalendarExpenseTable
                 expenses={expenses}
                 onExpenseUpdated={fetchExpenses}
+                categories={categoriesWithIcons}
+                categoryEmojis={categoryEmojis}
               />
             </div>
           </>
@@ -185,6 +208,7 @@ const HistoryPage: React.FC = () => {
         title="Add New Expense"
       >
         <ExpenseForm
+          categories={categoriesWithIcons}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
         />
