@@ -5,14 +5,12 @@ interface SidebarProps {
   onNavigate?: (page: string) => void;
   currentPage?: string;
   isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
   currentPage = "history",
   isCollapsed = false,
-  onToggleCollapse,
 }) => {
   const sidebarStyle: React.CSSProperties = {
     width: isCollapsed ? "80px" : "360px",
@@ -24,7 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     position: "fixed",
     left: 0,
     top: 0,
-    transition: "width 0.1s ease",
+    transition: "width 0.3s ease",
+    willChange: "width",
   };
 
   const headerStyle: React.CSSProperties = {
@@ -38,7 +37,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   const logoStyle: React.CSSProperties = {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: isCollapsed ? "0px" : "16px",
+    transition: "gap 0.3s ease",
   };
 
   const logoIconStyle: React.CSSProperties = {
@@ -55,8 +55,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const logoTextStyle: React.CSSProperties = {
-    display: isCollapsed ? "none" : "flex",
+    display: "flex",
     flexDirection: "column",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    maxWidth: isCollapsed ? "0px" : "220px",
+    opacity: isCollapsed ? 0 : 1,
+    transform: isCollapsed ? "translateX(-8px)" : "translateX(0)",
+    transition: "max-width 0.3s ease, opacity 0.2s ease, transform 0.3s ease",
+    pointerEvents: isCollapsed ? "none" : "auto",
   };
 
   const logoTitleStyle: React.CSSProperties = {
@@ -66,21 +73,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     lineHeight: 1.2,
   };
 
-  const toggleButtonStyle: React.CSSProperties = {
-    width: "40px",
-    height: "40px",
-    background: "transparent",
-    border: "none",
-    borderRadius: "8px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-
-    transition: "background 0.2s",
-    marginLeft: "16px",
-  };
-
   const navStyle: React.CSSProperties = {
     flex: 1,
     padding: "16px 0",
@@ -88,10 +80,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const navItemStyle: React.CSSProperties = {
     width: "100%",
-    padding: isCollapsed ? "16px" : "16px 24px",
+    padding: "16px 24px",
     display: "flex",
     alignItems: "center",
-    justifyContent: isCollapsed ? "center" : "flex-start",
+    justifyContent: "flex-start",
     gap: "16px",
     background: currentPage === "history" ? COLORS.primary.p03 : "transparent",
     border: "none",
@@ -104,7 +96,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const navTextStyle: React.CSSProperties = {
-    display: isCollapsed ? "none" : "inline",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    maxWidth: isCollapsed ? "0px" : "180px",
+    opacity: isCollapsed ? 0 : 1,
+    transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
+    transition: "max-width 0.3s ease, opacity 0.2s ease, transform 0.3s ease",
+    pointerEvents: isCollapsed ? "none" : "auto",
   };
 
   return (
@@ -116,26 +114,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div style={logoTitleStyle}>Expense Tracker</div>
           </div>
         </div>
-        <button
-          style={toggleButtonStyle}
-          aria-label="Toggle sidebar"
-          onClick={onToggleCollapse}
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#464343"
-            strokeWidth="2"
-            style={{
-              transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease",
-            }}
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
       </div>
 
       <nav style={navStyle}>
