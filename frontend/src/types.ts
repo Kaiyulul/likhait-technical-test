@@ -12,6 +12,17 @@ export interface Expense {
   updated_at: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  icon?: string | null;
+}
+
+export interface CreateCategoryData {
+  name: string;
+  icon?: string;
+}
+
 export interface ExpenseFormData {
   amount: string;
   description: string;

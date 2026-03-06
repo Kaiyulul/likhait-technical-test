@@ -2,10 +2,29 @@ import React, { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import HistoryPage from "./pages/HistoryPage";
 import { COLORS } from "./constants/colors";
+import { createCategory, fetchCategories } from "./services/api";
+import { Category, CreateCategoryData } from "./types";
+import { Modal } from "./vibes";
+import { CreateCategoryModal } from "./components/CreateCategoryModal";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("history");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+
+  React.useEffect(() => {
+    void loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await fetchCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const appStyle: React.CSSProperties = {
     display: "flex",
@@ -23,17 +42,34 @@ function App() {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  const handleCreateCategory = async (data: CreateCategoryData) => {
+    await createCategory(data);
+    await loadCategories();
+    setIsCreateCategoryOpen(false);
+  };
+
   return (
     <div style={appStyle}>
       <Sidebar
         currentPage={currentPage}
         onNavigate={setCurrentPage}
+        onAddCategory={() => setIsCreateCategoryOpen(true)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
       />
       <main style={mainStyle}>
-        {currentPage === "history" && <HistoryPage />}
+        {currentPage === "history" && <HistoryPage categories={categories} />}
       </main>
+      <Modal
+        isOpen={isCreateCategoryOpen}
+        onClose={() => setIsCreateCategoryOpen(false)}
+        title="Add Category"
+      >
+        <CreateCategoryModal
+          onSubmit={handleCreateCategory}
+          onCancel={() => setIsCreateCategoryOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

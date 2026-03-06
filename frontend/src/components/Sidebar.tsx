@@ -3,6 +3,7 @@ import { COLORS } from "../constants/colors";
 
 interface SidebarProps {
   onNavigate?: (page: string) => void;
+  onAddCategory?: () => void;
   currentPage?: string;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -10,6 +11,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
+  onAddCategory,
   currentPage = "history",
   isCollapsed = false,
   onToggleCollapse,
@@ -107,6 +109,26 @@ const Sidebar: React.FC<SidebarProps> = ({
     display: isCollapsed ? "none" : "inline",
   };
 
+  const addCategoryWrapStyle: React.CSSProperties = {
+    padding: "16px",
+    borderTop: `1px solid ${COLORS.secondary.s04}`,
+  };
+
+  const addCategoryButtonStyle: React.CSSProperties = {
+    width: "100%",
+    padding: isCollapsed ? "12px" : "12px 16px",
+    borderRadius: "8px",
+    border: `1px solid ${COLORS.secondary.s05}`,
+    background: "white",
+    color: COLORS.primary.p08,
+    fontWeight: 600,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: isCollapsed ? "center" : "flex-start",
+    gap: "8px",
+    cursor: "pointer",
+  };
+
   return (
     <aside style={sidebarStyle}>
       <div style={headerStyle}>
@@ -169,6 +191,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           <span style={navTextStyle}>History</span>
         </button>
       </nav>
+
+      <div style={addCategoryWrapStyle}>
+        <button style={addCategoryButtonStyle} onClick={onAddCategory}>
+          <span>+</span>
+          <span style={navTextStyle}>Add Category</span>
+        </button>
+      </div>
     </aside>
   );
 };

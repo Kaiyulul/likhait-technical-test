@@ -17,6 +17,7 @@ export function SelectBox({
   error,
   fullWidth = false,
   options,
+  required,
   ...props
 }: SelectBoxProps) {
   const containerStyle: React.CSSProperties = {
@@ -50,9 +51,18 @@ export function SelectBox({
     marginTop: "-0.25rem",
   };
 
+  const requiredAsteriskStyle: React.CSSProperties = {
+      color: COLORS.danger,
+      marginLeft: "0.125rem",
+    };
+
   return (
     <div style={containerStyle}>
-      {label && <label style={labelStyle}>{label}</label>}
+      {label && 
+        <label style={labelStyle}>
+          {label}
+          {required && <span style={requiredAsteriskStyle}>*</span>}
+        </label>}
       <select style={selectStyle} {...props}>
         <option value="">Select...</option>
         {options.map((option) => (

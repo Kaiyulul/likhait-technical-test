@@ -15,6 +15,7 @@ export function TextField({
   label,
   error,
   fullWidth = false,
+  required,
   ...props
 }: TextFieldProps) {
   const containerStyle: React.CSSProperties = {
@@ -47,10 +48,20 @@ export function TextField({
     marginTop: "-0.25rem",
   };
 
+  const requiredAsteriskStyle: React.CSSProperties = {
+    color: COLORS.danger,
+    marginLeft: "0.125rem",
+  };
+
   return (
     <div style={containerStyle}>
-      {label && <label style={labelStyle}>{label}</label>}
-      <input style={inputStyle} {...props} />
+      {label && (
+        <label style={labelStyle}>
+          {label}
+          {required && <span style={requiredAsteriskStyle}>*</span>}
+        </label>
+      )}
+      <input style={inputStyle} required={required} {...props} />
       {error && <span style={errorStyle}>{error}</span>}
     </div>
   );
